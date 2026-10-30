@@ -165,3 +165,33 @@ def dijkstra(graph, source, target=None, stats=None, normalize=True):
             "visited": len(visited),
         })
     return distances, predecessors
+
+# ====================================================================== #
+# T-W3 : reconstitution du chemin optimal
+# ====================================================================== #
+def reconstruct_path(predecessors, source, target, distances=None):
+    """Renvoie la liste ordonnée [source, ..., target], ou None s'il n'y a pas de chemin.
+
+    On part de la cible et on remonte les prédécesseurs jusqu'à la source
+    (predecessors[source] vaut None), puis on inverse la liste. O(longueur du chemin).
+    """
+    if source not in predecessors:
+        raise ValueError(f"Le noeud source '{source}' n'existe pas dans le graphe")
+    if target not in predecessors:
+        raise ValueError(f"Le noeud cible '{target}' n'existe pas dans le graphe")
+    if source == target:
+        return [source]
+    if distances is not None and distances.get(target, INFINITY) == INFINITY:
+        return None                              # cible inaccessible
+
+    path = []
+    node = target
+    while node is not None:
+        path.append(node)
+        if node == source:
+            path.reverse()
+            return path
+        node = predecessors[node]
+        if len(path) > len(predecessors):        # garde-fou contre une boucle infinie
+            raise RuntimeError("Cycle détecté dans la table des prédécesseurs")
+    return None                                  # la remontée n'a pas atteint la source
