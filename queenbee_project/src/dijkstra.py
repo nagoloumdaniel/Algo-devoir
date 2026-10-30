@@ -195,3 +195,53 @@ def reconstruct_path(predecessors, source, target, distances=None):
         if len(path) > len(predecessors):        # garde-fou contre une boucle infinie
             raise RuntimeError("Cycle détecté dans la table des prédécesseurs")
     return None                                  # la remontée n'a pas atteint la source
+
+
+# ====================================================================== #
+# T-W4 : distance / temps cumulé
+# ====================================================================== #
+def path_cost(graph, path):
+    """Recalcule le coût d'un chemin en additionnant le poids de ses arêtes.
+
+    Sert de vérification croisée avec distances[cible].
+    """
+    graph = normalize_graph(graph)
+    total = 0.0
+    for u, v in zip(path, path[1:]):          # paires consécutives : (A,C), (C,B), (B,D)
+        if v not in graph[u]:
+            raise ValueError(f"L'arête {u}->{v} n'existe pas")
+        total += graph[u][v]
+    return total
+
+
+def format_duration(minutes):
+    """Formate une durée exprimée en minutes en "X min Y sec".
+
+    >>> format_duration(12.5)
+    '12 min 30 sec'
+    """
+    if minutes is None or minutes == INFINITY:
+        return "inaccessible"
+    total_seconds = round(minutes * 60)
+    return f"{total_seconds // 60} min {total_seconds % 60} sec"
+
+
+def shortest_path(graph, source, target):
+    """Calcule le meilleur itinéraire source -> cible et le coût associé.
+
+    Renvoie un dictionnaire :
+        reachable  : bool
+        path       : liste ordonnée des noeuds, ou None si inaccessible
+        total_cost : coût total arrondi à 2 décimales, ou None si inaccessible
+        hop_count  : nombre d'arêtes parcourues, ou None si inaccessible
+    """
+    distances, predecessors = dijkstra(graph, source, target)
+    path = reconstruct_path(predecessors, source, target, distances)
+    if path is None:
+        return {"reachable": False, "path": None, "total_cost": None, "hop_count": None}
+    return {
+        "reachable": True,
+        "path": path,
+        "total_cost": round(distances[target], 2),
+        "hop_count": len(path) - 1,          # 4 noeuds = 3 tronçons
+    }
