@@ -3,6 +3,10 @@ Algorithme de Dijkstra — projet QueenBee, cas d'usage UC-C01 (interventions d'
 
 Contenu (tâches de Wissam) :
     T-W1  dijkstra()            Dijkstra avec file de priorité (tas binaire maison)
+    T-W3  reconstruct_path()    reconstitution du chemin optimal source -> cible
+    T-W4  shortest_path()       distance / temps cumulé + nombre d'étapes
+          format_duration()     formatage "X min Y sec"
+    T-W12 dijkstra_naive()      version naïve O(|V|²) sans tas (recherche linéaire)
 
 Aucune bibliothèque de graphes (NetworkX, SciPy...) n'est utilisée.
 
@@ -15,6 +19,7 @@ Une liste d'arêtes peut être convertie avec build_graph().
 Les poids doivent être >= 0 (condition de validité de Dijkstra).
 """
 
+import argparse
 import math
 
 from src.min_heap import BinaryHeap
@@ -166,6 +171,59 @@ def dijkstra(graph, source, target=None, stats=None, normalize=True):
         })
     return distances, predecessors
 
+
+# ====================================================================== #
+# T-W12 : version naïve sans tas  —  O(|V|²)
+# ====================================================================== #
+def dijkstra_naive(graph, source, target=None, stats=None, normalize=True):
+    """Même résultat que dijkstra(), mais le minimum est cherché par parcours linéaire.
+
+    Chacune des |V| itérations parcourt tous les noeuds non visités pour trouver
+    le plus proche : O(|V|) par itération, donc O(|V|²) au total, plus O(|E|)
+    pour les relâchements. Aucune file de priorité.
+    """
+    if normalize:
+        graph = normalize_graph(graph)
+    _check_node(graph, source, "source")
+    if target is not None:
+        _check_node(graph, target, "cible")
+
+    distances = {node: INFINITY for node in graph}
+    predecessors = {node: None for node in graph}
+    distances[source] = 0.0
+    unvisited = set(graph)
+    comparisons, relaxations = 0, 0
+
+    while unvisited:
+        # Recherche linéaire du noeud non visité de distance minimale.
+        node, best = None, INFINITY
+        for candidate in unvisited:
+            comparisons += 1
+            if distances[candidate] < best:
+                node, best = candidate, distances[candidate]
+        if node is None:             # tous les restants sont inaccessibles
+            break
+        unvisited.remove(node)
+        if node == target:
+            break
+        for neighbor, weight in graph[node].items():
+            if neighbor not in unvisited:
+                continue
+            relaxations += 1
+            new_dist = best + weight
+            if new_dist < distances[neighbor]:
+                distances[neighbor] = new_dist
+                predecessors[neighbor] = node
+
+    if stats is not None:
+        stats.update({
+            "comparisons": comparisons,
+            "relaxations": relaxations,
+            "visited": len(graph) - len(unvisited),
+        })
+    return distances, predecessors
+
+
 # ====================================================================== #
 # T-W3 : reconstitution du chemin optimal
 # ====================================================================== #
@@ -182,7 +240,7 @@ def reconstruct_path(predecessors, source, target, distances=None):
     if source == target:
         return [source]
     if distances is not None and distances.get(target, INFINITY) == INFINITY:
-        return None                              # cible inaccessible
+        return None
 
     path = []
     node = target
@@ -192,9 +250,9 @@ def reconstruct_path(predecessors, source, target, distances=None):
             path.reverse()
             return path
         node = predecessors[node]
-        if len(path) > len(predecessors):        # garde-fou contre une boucle infinie
+        if len(path) > len(predecessors):    # garde-fou contre une table corrompue
             raise RuntimeError("Cycle détecté dans la table des prédécesseurs")
-    return None                                  # la remontée n'a pas atteint la source
+    return None                              # la remontée n'a pas atteint la source
 
 
 # ====================================================================== #
@@ -207,7 +265,7 @@ def path_cost(graph, path):
     """
     graph = normalize_graph(graph)
     total = 0.0
-    for u, v in zip(path, path[1:]):          # paires consécutives : (A,C), (C,B), (B,D)
+    for u, v in zip(path, path[1:]):
         if v not in graph[u]:
             raise ValueError(f"L'arête {u}->{v} n'existe pas")
         total += graph[u][v]
@@ -219,6 +277,8 @@ def format_duration(minutes):
 
     >>> format_duration(12.5)
     '12 min 30 sec'
+    >>> format_duration(0)
+    '0 min 0 sec'
     """
     if minutes is None or minutes == INFINITY:
         return "inaccessible"
@@ -226,7 +286,7 @@ def format_duration(minutes):
     return f"{total_seconds // 60} min {total_seconds % 60} sec"
 
 
-def shortest_path(graph, source, target):
+def shortest_path(graph, source, target, use_heap=True):
     """Calcule le meilleur itinéraire source -> cible et le coût associé.
 
     Renvoie un dictionnaire :
@@ -235,7 +295,8 @@ def shortest_path(graph, source, target):
         total_cost : coût total arrondi à 2 décimales, ou None si inaccessible
         hop_count  : nombre d'arêtes parcourues, ou None si inaccessible
     """
-    distances, predecessors = dijkstra(graph, source, target)
+    algorithm = dijkstra if use_heap else dijkstra_naive
+    distances, predecessors = algorithm(graph, source, target)
     path = reconstruct_path(predecessors, source, target, distances)
     if path is None:
         return {"reachable": False, "path": None, "total_cost": None, "hop_count": None}
@@ -243,5 +304,33 @@ def shortest_path(graph, source, target):
         "reachable": True,
         "path": path,
         "total_cost": round(distances[target], 2),
-        "hop_count": len(path) - 1,          # 4 noeuds = 3 tronçons
+        "hop_count": len(path) - 1,
     }
+
+
+# ====================================================================== #
+# Point d'entrée en ligne de commande :  python -m src.dijkstra --help
+# ====================================================================== #
+def main(argv=None):
+    from src.site_graph import SITE_GRAPH
+
+    parser = argparse.ArgumentParser(
+        description="Plus court chemin (Dijkstra + tas binaire) sur le site de démo QueenBee.")
+    parser.add_argument("--source", default="BASE_NORD", help="noeud de départ")
+    parser.add_argument("--target", default="H07", help="noeud d'arrivée (ruche)")
+    parser.add_argument("--naive", action="store_true", help="utiliser la version O(|V|²)")
+    args = parser.parse_args(argv)
+
+    result = shortest_path(SITE_GRAPH, args.source, args.target, use_heap=not args.naive)
+    if not result["reachable"]:
+        print(f"Aucun chemin entre {args.source} et {args.target}.")
+        return 1
+    print("Chemin   :", " -> ".join(result["path"]))
+    print("Durée    :", format_duration(result["total_cost"]),
+          f"({result['total_cost']} min)")
+    print("Étapes   :", result["hop_count"])
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

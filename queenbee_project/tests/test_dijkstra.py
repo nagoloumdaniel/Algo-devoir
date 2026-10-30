@@ -8,11 +8,13 @@ import pytest
 from src.dijkstra import (
     build_graph,
     dijkstra,
+    dijkstra_naive,
     format_duration,
     path_cost,
     reconstruct_path,
     shortest_path,
 )
+from src.site_graph import SITE_GRAPH
 
 
 @pytest.fixture
@@ -175,3 +177,34 @@ def test_cible_inexistante(sample_graph):
 def test_poids_negatif_refuse():
     with pytest.raises(ValueError):
         dijkstra({"A": {"B": -1}, "B": {}}, "A")
+
+
+# ---------------------------------------------------------------------- #
+# T-W12 : version naïve — mêmes résultats que la version avec tas
+# ---------------------------------------------------------------------- #
+def test_naif_sur_le_graphe_exemple(sample_graph):
+    distances, _ = dijkstra_naive(sample_graph, "A")
+    assert distances == pytest.approx(EXPECTED_FROM_A)
+    result = shortest_path(sample_graph, "A", "F", use_heap=False)
+    assert result["path"] == ["A", "C", "B", "D", "E", "F"]
+
+
+def test_tas_et_naif_identiques_sur_tout_le_site():
+    """Depuis chaque noeud du site, les deux versions donnent les mêmes distances."""
+    for source in SITE_GRAPH:
+        d_heap, _ = dijkstra(SITE_GRAPH, source)
+        d_naive, _ = dijkstra_naive(SITE_GRAPH, source)
+        for node in SITE_GRAPH:
+            assert d_heap[node] == pytest.approx(d_naive[node]), (source, node)
+
+
+def test_naif_graphe_non_connexe():
+    graph = build_graph([("A", "B", 1), ("C", "D", 1)])
+    distances, _ = dijkstra_naive(graph, "A")
+    assert distances["C"] == math.inf
+    assert shortest_path(graph, "A", "D", use_heap=False)["reachable"] is False
+
+
+def test_naif_source_inexistante(sample_graph):
+    with pytest.raises(ValueError):
+        dijkstra_naive(sample_graph, "INCONNU")
