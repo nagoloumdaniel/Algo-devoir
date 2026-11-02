@@ -171,17 +171,6 @@ dans le backend sous la forme de l'endpoint <code>POST /api/v1/routing/emergency
 <table><tr><th>Tâches</th><th>Contenu</th><th>Réalisation</th></tr>{rows_d}</table>
 <p>Daniel a de plus ajouté les <b>tests E2E Playwright</b> (8 tests, 7 captures d'écran) et corrigé le <code>.gitignore</code>
 (encodage cassé, fichiers <code>__pycache__</code> suivis par git).</p>
-<h2>3. Checklist du sujet</h2>
-<table><tr><th>Exigence</th><th>Statut</th><th>Preuve</th></tr>
-<tr><td>Dijkstra avec min-heap (sans bibliothèque de graphes)</td><td class="ok">Fait</td><td>src/min_heap.py, src/dijkstra.py</td></tr>
-<tr><td>Reconstitution du chemin, coût cumulé</td><td class="ok">Fait</td><td>reconstruct_path, path_cost, format_duration</td></tr>
-<tr><td>Cas limites (non connexe, cycles, source = cible, vide, un seul nœud)</td><td class="ok">Fait</td><td>tests/test_dijkstra.py</td></tr>
-<tr><td>Endpoint REST, sortie JSON (coût, chemin, temps de calcul)</td><td class="ok">Fait</td><td>src/api.py, captures E2E</td></tr>
-<tr><td>Version naïve O(|V|²) et benchmark comparatif</td><td class="ok">Fait</td><td>src/benchmark.py, section 5</td></tr>
-<tr><td>Complexité formalisée O((|V|+|E|) log |V|)</td><td class="ok">Fait</td><td>section 5</td></tr>
-<tr><td>Tests unitaires et E2E passants</td><td class="ok">Fait</td><td>{html.escape(unit_sum)} ; {html.escape(e2e_sum)}</td></tr>
-<tr><td>PDF unique &lt; 5 Mo</td><td class="ok">Fait</td><td>ce document</td></tr>
-<tr><td>Dépôt Pronote par les deux étudiants</td><td>À faire</td><td>avant le 05/11/2026</td></tr></table>
 </section>""")
 
     p.append("<section class=\"page\"><h1>3. Implémentation de l'algorithme (code source)</h1>"
