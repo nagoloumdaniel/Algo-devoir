@@ -1,1 +1,4 @@
-@("__pycache__/", ".pytest_cache/") | Set-Content .gitignore
+__pycache__/
+.pytest_cache/
+*.pyc
+docs/rapport.html
