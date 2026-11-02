@@ -1,5 +1,5 @@
 """
-API REST QueenBee — routage d'urgence (T-W5, T-W6, T-W7).
+API REST QueenBee : routage d'urgence (T-W5, T-W6, T-W7).
 
     POST /api/v1/routing/emergency-path
 
@@ -138,7 +138,7 @@ def emergency_path(request: EmergencyPathRequest) -> EmergencyPathResponse:
 app = FastAPI(
     title="QueenBee API",
     version="1.0.0",
-    description="Backend QueenBee — calcul d'itinéraires d'urgence (UC-C01).",
+    description="Backend QueenBee : calcul d'itinéraires d'urgence (UC-C01).",
 )
 app.include_router(router)
 

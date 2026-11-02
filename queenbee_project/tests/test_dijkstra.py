@@ -180,7 +180,7 @@ def test_poids_negatif_refuse():
 
 
 # ---------------------------------------------------------------------- #
-# T-W12 : version naïve — mêmes résultats que la version avec tas
+# T-W12 : version naïve, mêmes résultats que la version avec tas
 # ---------------------------------------------------------------------- #
 def test_naif_sur_le_graphe_exemple(sample_graph):
     distances, _ = dijkstra_naive(sample_graph, "A")

@@ -1,4 +1,4 @@
-# Note d'analyse de complexité — Dijkstra (QueenBee, UC-C01)
+# Note d'analyse de complexité : Dijkstra (QueenBee, UC-C01)
 
 Notations : *n* = |V| (nombre de sommets), *m* = |E| (nombre d'arêtes), *s* = sommet source, *w(u, v)* ≥ 0 le poids d'une arête, *d[v]* la distance provisoire et δ(s, v) la vraie distance minimale.
 
@@ -14,18 +14,18 @@ L'hypothèse *w* ≥ 0 est indispensable. C'est pourquoi le code rejette les poi
 
 L'implémentation utilise la **suppression paresseuse** : quand une distance s'améliore, on ré-insère le sommet au lieu de faire un *decrease-key*, et les entrées périmées sont ignorées à l'extraction.
 
-**Étape 1 — initialisation.** La création des tableaux `distances` et `predecessors` coûte O(n).
+**Étape 1 : initialisation.** La création des tableaux `distances` et `predecessors` coûte O(n).
 
-**Étape 2 — nombre de relâchements.** Un sommet n'est développé qu'une seule fois, grâce à l'ensemble `visited`. Ses arêtes sortantes ne sont donc parcourues qu'une fois. Le nombre total de relâchements est Σ deg(u) = O(m).
+**Étape 2 : nombre de relâchements.** Un sommet n'est développé qu'une seule fois, grâce à l'ensemble `visited`. Ses arêtes sortantes ne sont donc parcourues qu'une fois. Le nombre total de relâchements est Σ deg(u) = O(m).
 
-**Étape 3 — nombre d'opérations sur le tas.**
+**Étape 3 : nombre d'opérations sur le tas.**
 - Insertions : 1 pour la source, plus au plus 1 par relâchement réussi. On a donc au plus m + 1 insertions.
 - Extractions : on n'extrait que ce qu'on a inséré, donc au plus m + 1 extractions.
 - Taille maximale du tas : m + 1.
 
-**Étape 4 — coût d'une opération.** Le tas est un arbre binaire presque complet, de hauteur ⌊log₂ k⌋ pour k éléments. `insert` (remontée) et `extract_min` (descente) parcourent au plus cette hauteur, soit O(log(m + 1)). Comme m ≤ n², on a log m ≤ 2 log n, donc **O(log m) = O(log n)**.
+**Étape 4 : coût d'une opération.** Le tas est un arbre binaire presque complet, de hauteur ⌊log₂ k⌋ pour k éléments. `insert` (remontée) et `extract_min` (descente) parcourent au plus cette hauteur, soit O(log(m + 1)). Comme m ≤ n², on a log m ≤ 2 log n, donc **O(log m) = O(log n)**.
 
-**Étape 5 — total.**
+**Étape 5 : total.**
 
 T(n, m) = O(n) + (m + 1) · O(log n) [insertions] + (m + 1) · O(log n) [extractions] + O(m) [relâchements]
         = **O((n + m) log n)**

@@ -148,7 +148,7 @@ def save_plot(rows, path, density):
                 marker="s", capsize=3, label="Dijkstra naïf  O(V²)")
     ax.set_xlabel("Nombre de noeuds |V|")
     ax.set_ylabel("Temps d'exécution (ms)")
-    ax.set_title(f"Benchmark Dijkstra — graphes {'denses' if density == 'dense' else 'clairsemés'}")
+    ax.set_title(f"Benchmark Dijkstra : graphes {'denses' if density == 'dense' else 'clairsemés'}")
     ax.grid(True, alpha=0.3)
     ax.legend()
     fig.tight_layout()

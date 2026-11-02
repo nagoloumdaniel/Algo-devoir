@@ -1,5 +1,5 @@
 """
-Tas binaire minimum (Min-Heap) implémenté de zéro — T-W2.
+Tas binaire minimum (Min-Heap) implémenté de zéro, T-W2.
 
 Aucune dépendance externe : le module ``heapq`` de Python n'est PAS utilisé.
 

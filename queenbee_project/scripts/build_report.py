@@ -22,6 +22,18 @@ from pygments.lexers import PythonLexer
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 OUT_PDF = DOCS / "Compte_Rendu_QueenBee_Dijkstra.pdf"
+FONTS = ROOT / "assets" / "fonts"
+
+
+def font_face(family, weight, file, fmt):
+    data = base64.b64encode((FONTS / file).read_bytes()).decode()
+    return (f"@font-face {{ font-family: '{family}'; font-weight: {weight}; "
+            f"src: url(data:font/{fmt};base64,{data}) format('{fmt}'); }}\n")
+
+
+FONT_CSS = (font_face("Inter", 400, "Inter-400.woff2", "woff2") + font_face("Inter", 600, "Inter-600.woff2", "woff2")
+            + font_face("Inter", 700, "Inter-700.woff2", "woff2") + font_face("Poppins", 500, "Poppins-Medium.ttf", "truetype")
+            + font_face("Poppins", 700, "Poppins-Bold.ttf", "truetype"))
 
 MEMBERS = [("Daniel Nagoloum TALLA", "Tests E2E, captures, rapport PDF, dépôt GitHub"),
            ("Wissam AIT EL HADI", "Algorithme, tas binaire, API, tests unitaires, benchmark")]
@@ -36,7 +48,7 @@ def run(cmd):
 def code_block(path, title):
     src = (ROOT / path).read_text(encoding="utf-8")
     body = highlight(src, PythonLexer(), HtmlFormatter(linenos="inline", cssclass="hl"))
-    return (f"<h3>{html.escape(title)} <small>— <code>{path}</code> "
+    return (f"<h3>{html.escape(title)} <small><code>{path}</code> "
             f"({src.count(chr(10)) + 1} lignes)</small></h3>{body}")
 
 
@@ -54,7 +66,7 @@ def analysis_html():
 
     def repl(m):
         p, cap = m.group(1).split("|", 1)
-        return img("docs/" + p, "Figure — " + cap, "92%")
+        return img("docs/" + p, "Figure : " + cap, "92%")
 
     out = re.sub(r"<p>@@IMG:(.*?)@@</p>", repl, out)
     return out.replace("<h2>", "<h3>").replace("</h2>", "</h3>")
@@ -89,8 +101,9 @@ TASKS_D = [
 
 CSS = """
 * { box-sizing: border-box; }
-body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10.5pt; line-height: 1.45; color: #1f2430; }
-h1 { font-size: 21pt; color: #7a4b00; border-bottom: 3px solid #f2a900; padding-bottom: 5px; margin-top: 0; }
+body { font-family: 'Inter', sans-serif; font-size: 10.5pt; line-height: 1.45; color: #1f2430; }
+h1, h2, h3, th, .cover .sub { font-family: 'Poppins', 'Inter', sans-serif; }
+h1 { font-weight: 700; font-size: 21pt; color: #7a4b00; border-bottom: 3px solid #f2a900; padding-bottom: 5px; margin-top: 0; }
 h2 { font-size: 15pt; color: #7a4b00; margin-top: 18px; }
 h3 { font-size: 12pt; color: #333; margin-top: 16px; }
 h3 small { font-weight: normal; color: #666; font-size: 9pt; }
@@ -108,7 +121,6 @@ figure { margin: 10px 0; text-align: center; break-inside: avoid; }
 figure img { border: 1px solid #ccc; border-radius: 4px; }
 figcaption { font-size: 8.5pt; color: #555; font-style: italic; margin-top: 3px; }
 .cover { text-align: center; padding-top: 60px; }
-.cover .hex { font-size: 60pt; color: #f2a900; }
 .cover h1 { border: none; font-size: 28pt; margin-bottom: 4px; }
 .cover .sub { font-size: 14pt; color: #444; margin-bottom: 40px; }
 .cover .box { display: inline-block; text-align: left; border: 2px solid #f2a900; border-radius: 8px; padding: 14px 30px; margin: 10px 0; }
@@ -129,19 +141,18 @@ def build_html():
     rows_d = "".join(f"<tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>" for a, b, c in TASKS_D)
     names_li = "".join(f'<li style="font-size:14pt">{n}</li>' for n, _ in MEMBERS)
 
-    p = [f"<html><head><meta charset='utf-8'><style>{CSS}{hl_css}</style></head><body>"]
+    p = [f"<html><head><meta charset='utf-8'><style>{FONT_CSS}{CSS}{hl_css}</style></head><body>"]
 
     p.append(f"""
 <section class="cover">
-  <div class="hex">⬡</div>
-  <h1>Projet QueenBee — Algorithme de Dijkstra</h1>
-  <div class="sub">Plus court chemin à source unique — Interventions d'urgence (UC-C01)</div>
+  <h1>Projet QueenBee : Algorithme de Dijkstra</h1>
+  <div class="sub">Plus court chemin à source unique, interventions d'urgence (UC-C01)</div>
   <div class="box"><b>Membres du groupe (binôme)</b><ul>{names_li}</ul></div>
   <div class="meta">
     <p><b>Spécialité :</b> Développement / DevOps<br>
-    <b>Formation :</b> Mastère 1 — INGETIS / ITIS — Application fil rouge QueenBee<br>
+    <b>Formation :</b> Mastère 1 INGETIS / ITIS, application fil rouge QueenBee<br>
     <b>Évaluation :</b> Algorithmique (sujet B : Dijkstra, file de priorité / tas binaire)<br>
-    <b>Date de rendu :</b> 05/11/2026 (Pronote) — document généré le {date.today().strftime('%d/%m/%Y')}<br>
+    <b>Date de rendu :</b> 05/11/2026 (Pronote), document généré le {date.today().strftime('%d/%m/%Y')}<br>
     <b>Dépôt :</b> {GITHUB}</p>
   </div>
 </section>""")
@@ -210,8 +221,8 @@ dans le backend sous la forme de l'endpoint <code>POST /api/v1/routing/emergency
 def main():
     html_text = build_html()
     (DOCS / "rapport.html").write_text(html_text, encoding="utf-8")
-    footer = ("<div style='font-size:8px;width:100%;text-align:center;color:#777'>"
-              "QueenBee — Dijkstra — Daniel Nagoloum TALLA &amp; Wissam AIT EL HADI — page "
+    footer = ("<div style='font-family:Inter,sans-serif;font-size:8px;width:100%;text-align:center;color:#777'>"
+              "QueenBee | Dijkstra | Daniel Nagoloum TALLA &amp; Wissam AIT EL HADI | page "
               "<span class='pageNumber'></span>/<span class='totalPages'></span></div>")
     with sync_playwright() as pw:
         browser = pw.chromium.launch()

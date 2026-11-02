@@ -1,4 +1,4 @@
-"""Tests de la logique métier de l'endpoint (T-W5, T-W7) — sans serveur HTTP."""
+"""Tests de la logique métier de l'endpoint (T-W5, T-W7), sans serveur HTTP."""
 
 import json
 

@@ -1,5 +1,5 @@
 """
-Algorithme de Dijkstra — projet QueenBee, cas d'usage UC-C01 (interventions d'urgence).
+Algorithme de Dijkstra, projet QueenBee, cas d'usage UC-C01 (interventions d'urgence).
 
 Contenu (tâches de Wissam) :
     T-W1  dijkstra()            Dijkstra avec file de priorité (tas binaire maison)
@@ -87,7 +87,7 @@ def _check_node(graph, node, role):
 
 
 # ====================================================================== #
-# T-W1 : Dijkstra avec tas binaire  —  O((|V| + |E|) log |V|)
+# T-W1 : Dijkstra avec tas binaire : O((|V| + |E|) log |V|)
 # ====================================================================== #
 def dijkstra(graph, source, target=None, stats=None, normalize=True):
     """Plus courts chemins depuis ``source`` avec une file de priorité (Min-Heap).
@@ -173,7 +173,7 @@ def dijkstra(graph, source, target=None, stats=None, normalize=True):
 
 
 # ====================================================================== #
-# T-W12 : version naïve sans tas  —  O(|V|²)
+# T-W12 : version naïve sans tas : O(|V|²)
 # ====================================================================== #
 def dijkstra_naive(graph, source, target=None, stats=None, normalize=True):
     """Même résultat que dijkstra(), mais le minimum est cherché par parcours linéaire.

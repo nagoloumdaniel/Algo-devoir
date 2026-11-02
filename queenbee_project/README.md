@@ -1,8 +1,8 @@
-# QueenBee — Dijkstra (itinéraires d'urgence UC-C01)
+# QueenBee : Dijkstra (itinéraires d'urgence UC-C01)
 
 Calcul du plus court chemin à source unique (Dijkstra, tas binaire codé à la main) pour envoyer
 un coordinateur régional vers une ruche en alerte critique. Exposé via une API REST FastAPI.
-Projet Mastère 1 INGETIS / ITIS — spécialité Développement / DevOps.
+Projet Mastère 1 INGETIS / ITIS, spécialité Développement / DevOps.
 
 **Binôme :** Daniel Nagoloum TALLA et Wissam AIT EL HADI.
 
